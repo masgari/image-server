@@ -1,4 +1,5 @@
-var thrift = require('thrift');
+var thrift = require('thrift'),
+    fs = require('fs');
 
 var ImageService = require('../../build/gen-nodejs/ImageService.js'),
     ttypes = require('../../build/gen-nodejs/service_types.js');
@@ -14,16 +15,28 @@ client.ping(function(err, response){
     }
 });
 
-var image = ttypes.TImage({data:0,width:100,height:100});
-client.resize(image, function(err, response){
-    if (err) {
-        console.log('error:', err);
-    } else {
-        console.log('response:', response)
+function resizeImage(imageData) {
+    var image = new ttypes.TImage({data:imageData,width:100,height:80});
+    console.log('image:', image);
+    client.resize(image, function(err, response){
+        if (err) {
+            console.log('error:', err);
+        } else {
+            console.log('response:', response)
 
+        }
+        //connection.end();
+    });
+
+}
+fs.readFile('girl.jpg', function(err, data){
+    if (err) {
+        console.log('error in reading test file')
+    } else {
+        resizeImage(data);
     }
-    connection.end();
 });
+
 
 connection.on('error', function(err) {
   console.error(err);
