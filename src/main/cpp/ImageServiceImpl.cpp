@@ -57,7 +57,7 @@ void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& reque
         }        
         pixDestroy(&pix);
     } else {
-        _return.error = "Could not create image from data";
+        _return.__set_error("Could not create image from data");
     }
 }
 
