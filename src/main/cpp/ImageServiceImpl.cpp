@@ -28,13 +28,8 @@ int8_t ImageServiceImpl::handlePing() {
 }
 
 void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& request) {
-    if ( 1 == 1) {
-        _return.error = std::string("Just for test");
-        cout << _return.error << " <<\n";
-        return;
-    }
     if (request.data.length() < 1) {
-        _return.error = "Invalid data";
+        _return.__set_error("Invalid data");
         return;
     }
     cout << "resize request, w:"<< request.width << ", h:" << request.height <<"\n";
@@ -51,10 +46,11 @@ void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& reque
             size_t size = 0;
             
             if (0 == pixWriteMem(&bytes, &size, scaledPix, pix->informat)) {
-                _return.result.width = scaledPix->w;
-                _return.result.height = scaledPix->h;
-                _return.result.data.assign((char*)bytes, size);
-                _return.error= "No Error";
+                TImage result;
+                result.__set_width(scaledPix->w);
+                result.__set_height(scaledPix->h);
+                result.__set_data(std::string((char*)bytes, size));
+                _return.__set_result(result);
                 cout<<"new size:"<<_return.result.data.length()<<", original size:"<< request.data.length() <<"\n";
             }
             pixDestroy(&scaledPix);

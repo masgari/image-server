@@ -22,10 +22,17 @@ function resizeImage(imageData) {
         if (err) {
             console.log('error:', err);
         } else {
-            console.log('response:', response)
+            fs.writeFile('resized.jpg', response.result.data, 'binary', function(err){
+                if (err) {
+                    console.log('error in writing result to file');
+                } else {
+                    console.log('result has been written to file.')
+                    connection.end();
+                }
+            });
 
         }
-        //connection.end();
+
     });
 
 }
