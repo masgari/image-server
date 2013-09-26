@@ -17,7 +17,7 @@ from thrift.transport import TSocket
 from thrift.transport import THttpClient
 from thrift.protocol import TBinaryProtocol
 
-sys.path.insert(0, '../../build/gen-py/service/')
+sys.path.insert(0, '../../../../build/gen-py/service/')
 import ImageService
 from ttypes import *
 

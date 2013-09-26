@@ -1,8 +1,8 @@
 var thrift = require('thrift'),
     fs = require('fs');
 
-var ImageService = require('../../build/gen-nodejs/ImageService.js'),
-    ttypes = require('../../build/gen-nodejs/service_types.js');
+var ImageService = require('../../../../build/gen-nodejs/ImageService.js'),
+    ttypes = require('../../../../cbuild/gen-nodejs/service_types.js');
 
 var connection = thrift.createConnection('localhost', 3800, {transport:thrift.TFramedTransport});
 var client = thrift.createClient(ImageService, connection);
