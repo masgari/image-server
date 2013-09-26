@@ -3,7 +3,7 @@
 */
 
 struct TImage {
-    1: required binary data;
+    1: required list<byte> data;
     2: optional i16 width;
     3: optional i16 height;
 }

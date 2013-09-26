@@ -8,6 +8,8 @@
 #
 
 import sys
+import os
+import array
 import pprint
 from urlparse import urlparse
 from thrift.transport import TTransport
@@ -85,8 +87,15 @@ if cmd == 'ping':
   pp.pprint(client.ping())
 
 elif cmd == 'resize':
-  image = TImage('abc', 100, 80)
-  pp.pprint(client.resize(image,))
+  fname = '../nodejs-client/girl.jpg'
+  flen = os.path.getsize(fname)
+  with open(fname, mode='rb') as file:      
+    a = file.read()
+    print(a)
+    image = TImage(a, 100, 80)
+    resp = client.resize(image,)
+    with open('resized.jpg', mode='wb') as out:
+        out.write(resp.result.data)
 
 else:
   print 'Unrecognized method %s' % cmd

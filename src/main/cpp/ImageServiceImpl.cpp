@@ -28,13 +28,22 @@ int8_t ImageServiceImpl::handlePing() {
 }
 
 void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& request) {
-    if (request.data.length() < 1) {
+    if (request.data.size() < 1) {
         _return.__set_error("Invalid data");
         return;
     }
     cout << "resize request, w:"<< request.width << ", h:" << request.height <<"\n";
-    l_uint8* data = (l_uint8*)request.data.data();
-    PIX* pix = pixReadMem(data, request.data.length());
+    l_uint8* data = (l_uint8*)&request.data[0];
+    PIX* pix = NULL;
+    try {
+        pix = pixReadMem(data, request.data.size());
+    } catch(const std::exception& e) {
+        cerr<<"Error in reading image\n";
+        return;
+    } catch(...) {
+        cerr<<"Unknown error in reading image\n";
+        return;
+    }
     if (pix != NULL) {
         cout<< "Resizing image\n";
         l_float32 pw = pixGetWidth(pix);
@@ -42,16 +51,17 @@ void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& reque
         l_float32 s = min(request.width / pw, request.height / ph);
         PIX* scaledPix = pixScale(pix, s, s); 
         if (scaledPix != NULL) {
-            l_uint8 *bytes = NULL;
+            l_uint8* bytes = NULL;
             size_t size = 0;
             
             if (0 == pixWriteMem(&bytes, &size, scaledPix, pix->informat)) {
                 TImage result;
                 result.__set_width(scaledPix->w);
                 result.__set_height(scaledPix->h);
-                result.__set_data(std::string((char*)bytes, size));
+                std::vector<int8_t> v(bytes, bytes+size);
+                result.__set_data(v);
                 _return.__set_result(result);
-                cout<<"new size:"<<_return.result.data.length()<<", original size:"<< request.data.length() <<"\n";
+                cout<<"new size:"<< size <<", original size:"<< request.data.size() <<"\n";
             }
             pixDestroy(&scaledPix);
         }        

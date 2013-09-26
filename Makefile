@@ -3,8 +3,11 @@ BOOST  := /usr/include/boost
 THRIFT := /usr/local/include/thrift  
 
 CC=g++
-CFLAGS=-O -c -Wall 
-LDFLAGS=-O
+#debug flags
+#DEBUG=-o0 -g
+DEBUG=
+CFLAGS=$(DEBUG) -c -Wall 
+LDFLAGS=$(DEBUG)
 
 SRC=src/main/cpp
 GEN_THRIFT=build/gen-cpp

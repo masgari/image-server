@@ -16,19 +16,23 @@ client.ping(function(err, response){
 });
 
 function resizeImage(imageData) {
+    console.log('image:', imageData);
     var image = new ttypes.TImage({data:imageData,width:100,height:80});
-    console.log('image:', image);
     client.resize(image, function(err, response){
         if (err) {
             console.log('error:', err);
         } else {
-            fs.writeFile('resized.jpg', response.result.data, 'binary', function(err){
+            var fd =  fs.openSync('resized.jpg', 'w');
+            var data = response.result.data;
+            var buff = new Buffer(data);
+            console.log('result:', buff);
+            fs.write(fd, buff, 0, buff.length, 0, function(err,written){
                 if (err) {
                     console.log('error in writing result to file');
                 } else {
-                    console.log('result has been written to file.')
-                    connection.end();
+                    console.log('result has been written to file. bytes:', written)
                 }
+                connection.end();
             });
 
         }
