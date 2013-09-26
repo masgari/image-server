@@ -1,0 +1,1 @@
+module.exports = require('./lib/pis-client.js');

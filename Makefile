@@ -29,7 +29,7 @@ OBJECTS:= service_types.o service_constants.o ImageService.o ImageServiceImpl.o 
 OBJS := $(patsubst %,$(OUT)/%,$(OBJECTS))
 
 
-all: init thrift link clear-tmps
+all: init thrift link update-pis-client clear-tmps
 
 init:
 	mkdir -p $(OUT)
@@ -60,6 +60,8 @@ thrift:
 	thrift -o $(OUT) --gen js:node $(THRIFT_SRC)
 	thrift -o $(OUT) --gen cpp $(THRIFT_SRC)
 	thrift -o $(OUT) --gen py $(THRIFT_SRC)
-	
+
+update-pis-client:
+	cp $(OUT)/gen-nodejs/*.js src/pis-client/lib/
 .PHONY:    		
 	echo "phony"

@@ -1,0 +1,33 @@
+{
+    "name": "pis-client",
+    "version": "0.0.1",
+    "description": "Node.js client for ImageServer - Peach project",
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "ping"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:masgari/image-server.git"
+    },
+    "keywords": [
+        "Peach",
+        "ImageServer",
+        "Thrift",
+        "client",
+        "leptonica"
+    ],
+    "author": "Mamad Asgari",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/masgari/image-server/issues"
+    },
+
+    "devDependencies": {
+        "mocha": "",
+        "should": ""
+    }
+}
