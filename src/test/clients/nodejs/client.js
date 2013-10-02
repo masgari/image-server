@@ -16,12 +16,16 @@ client.ping(function(err, response){
 });
 
 function resizeImage(imageData) {
-    console.log('image:', imageData);
+    console.log('resizing image:', imageData);
     var image = new ttypes.TImage({data:imageData,width:100,height:80});
     client.resize(image, function(err, response){
         if (err) {
             console.log('error:', err);
         } else {
+            if (response.error) {
+                console.log('server error:', err);
+                return;
+            }
             var fd =  fs.openSync('resized.jpg', 'w');
             var data = response.result.data;
             var buff = new Buffer(data);
@@ -32,19 +36,44 @@ function resizeImage(imageData) {
                 } else {
                     console.log('result has been written to file. bytes:', written)
                 }
-                connection.end();
             });
-
         }
-
     });
-
 }
+
+function cartoonizeImage(imageData) {
+    console.log('cartoonizing image:', imageData);
+    var image = new ttypes.TImage({data:imageData,width:100,height:80});
+    client.cartoonize(image, function(err, response){
+        if (err) {
+            console.log('error:', err);
+        } else {
+            if (response.error) {
+                console.log('server error:', err);
+                return;
+            }
+            var fd =  fs.openSync('cartoonize.jpg', 'w');
+            var data = response.result.data;
+            var buff = new Buffer(data);
+            console.log('result:', buff);
+            fs.write(fd, buff, 0, buff.length, 0, function(err,written){
+                if (err) {
+                    console.log('error in writing result to file');
+                } else {
+                    console.log('result has been written to file. bytes:', written)
+                }
+            });
+        }
+    });
+}
+
 fs.readFile('girl.jpg', function(err, data){
     if (err) {
         console.log('error in reading test file')
     } else {
         resizeImage(data);
+        cartoonizeImage(data);
+        connection.end();
     }
 });
 

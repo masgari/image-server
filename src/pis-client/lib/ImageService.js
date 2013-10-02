@@ -197,6 +197,114 @@ ImageService_resize_result.prototype.write = function(output) {
   return;
 };
 
+ImageService_cartoonize_args = function(args) {
+  this.request = null;
+  if (args) {
+    if (args.request !== undefined) {
+      this.request = args.request;
+    }
+  }
+};
+ImageService_cartoonize_args.prototype = {};
+ImageService_cartoonize_args.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.request = new ttypes.TImage();
+        this.request.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+ImageService_cartoonize_args.prototype.write = function(output) {
+  output.writeStructBegin('ImageService_cartoonize_args');
+  if (this.request !== null && this.request !== undefined) {
+    output.writeFieldBegin('request', Thrift.Type.STRUCT, 1);
+    this.request.write(output);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+ImageService_cartoonize_result = function(args) {
+  this.success = null;
+  if (args) {
+    if (args.success !== undefined) {
+      this.success = args.success;
+    }
+  }
+};
+ImageService_cartoonize_result.prototype = {};
+ImageService_cartoonize_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 0:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.success = new ttypes.TImageResponse();
+        this.success.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+ImageService_cartoonize_result.prototype.write = function(output) {
+  output.writeStructBegin('ImageService_cartoonize_result');
+  if (this.success !== null && this.success !== undefined) {
+    output.writeFieldBegin('success', Thrift.Type.STRUCT, 0);
+    this.success.write(output);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
 ImageServiceClient = exports.Client = function(output, pClass) {
     this.output = output;
     this.pClass = pClass;
@@ -271,6 +379,40 @@ ImageServiceClient.prototype.recv_resize = function(input,mtype,rseqid) {
   }
   return callback('resize failed: unknown result');
 };
+ImageServiceClient.prototype.cartoonize = function(request, callback) {
+  this.seqid += 1;
+  this._reqs[this.seqid] = callback;
+  this.send_cartoonize(request);
+};
+
+ImageServiceClient.prototype.send_cartoonize = function(request) {
+  var output = new this.pClass(this.output);
+  output.writeMessageBegin('cartoonize', Thrift.MessageType.CALL, this.seqid);
+  var args = new ImageService_cartoonize_args();
+  args.request = request;
+  args.write(output);
+  output.writeMessageEnd();
+  return this.output.flush();
+};
+
+ImageServiceClient.prototype.recv_cartoonize = function(input,mtype,rseqid) {
+  var callback = this._reqs[rseqid] || function() {};
+  delete this._reqs[rseqid];
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(input);
+    input.readMessageEnd();
+    return callback(x);
+  }
+  var result = new ImageService_cartoonize_result();
+  result.read(input);
+  input.readMessageEnd();
+
+  if (null !== result.success) {
+    return callback(null, result.success);
+  }
+  return callback('cartoonize failed: unknown result');
+};
 ImageServiceProcessor = exports.Processor = function(handler) {
   this._handler = handler
 }
@@ -309,6 +451,19 @@ ImageServiceProcessor.prototype.process_resize = function(seqid, input, output) 
   this._handler.resize(args.request, function (err, result) {
     var result = new ImageService_resize_result((err != null ? err : {success: result}));
     output.writeMessageBegin("resize", Thrift.MessageType.REPLY, seqid);
+    result.write(output);
+    output.writeMessageEnd();
+    output.flush();
+  })
+}
+
+ImageServiceProcessor.prototype.process_cartoonize = function(seqid, input, output) {
+  var args = new ImageService_cartoonize_args();
+  args.read(input);
+  input.readMessageEnd();
+  this._handler.cartoonize(args.request, function (err, result) {
+    var result = new ImageService_cartoonize_result((err != null ? err : {success: result}));
+    output.writeMessageBegin("cartoonize", Thrift.MessageType.REPLY, seqid);
     result.write(output);
     output.writeMessageEnd();
     output.flush();

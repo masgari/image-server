@@ -20,5 +20,10 @@ service ImageService {
     */
     byte ping(),
 
-    TImageResponse resize(1:TImage request)
+    TImageResponse resize(1:TImage request),
+    
+    /**
+    * Convert input image to cartoon
+    */
+    TImageResponse cartoonize(1:TImage request)
 }

@@ -82,6 +82,28 @@ module.exports = {
                 });
             }
         });
+    },
+
+    testCartoonizeImage : function(test) {
+        var pisClient = this.client;
+        var tester = test;
+        fs.readFile('girl.jpg', function(fsErr, data){
+            if (fsErr) {
+                console.log('error in reading test image file.\n');
+                tester.done();
+            } else {
+                tester.ok(data);
+                tester.ok(data.length > 0);
+                pisClient.cartoonize(data, 100, 80, function(err, returnData, w, h){
+                    should.not.exist(err);
+                    tester.ok(returnData, 'Cartoonized data should not be null.');
+                    tester.ok(returnData.length > 0, 'Cartoonized data length should not be 0.');
+                    tester.ok(w > 0, 'Cartoonized width should not be 0.');
+                    tester.ok(h > 0, 'Cartoonized height should not be 0.');
+                    tester.done();
+                });
+            }
+        });
     }
 
 }

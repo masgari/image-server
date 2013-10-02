@@ -20,7 +20,7 @@ static const char* BLUR_KERNEL = " 5 10 20 10 5 " " 10 20 50 20 10 " " 10 70 140
 static const char* BLUR_KERNEL_3 = " 10 10 10 " " 10 10 10 " " 10 10 10 ";
 //static const char* BLUR_KERNEL_3 = " 51 51 51 " " 51 51 51 " " 51 51 51 ";
 
-PIX * pixEdgeFilter(PIX     *pixs,l_int32  orientflag);
+PIX* pixEdgeFilter(PIX* pixs,l_int32  orientflag);
 
 main(int argc, char *argv[]) {
 	printf("Leptonica Cartooniser\nConvert images to cartoon v0.1\n");

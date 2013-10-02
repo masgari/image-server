@@ -113,6 +113,34 @@ Client.prototype.resize = function (imageData, width, height, callback) {
     }
 };
 
+/**
+ * cartoonize function, to make cartoon like of the input image
+ * @param imageData input image binary buffer
+ * @param width requested width
+ * @param height requested height
+ * @param callback in format function(err, cartoonImageData, cartoonWidth, cartoonHeight)
+ */
+Client.prototype.cartoonize = function (imageData, width, height, callback) {
+    var self = this;
+    try {
+        var request = new ttypes.TImage({data: imageData, width: width, height: height});
+        this.thriftClient.cartoonize(request, function (err, response) {
+            if (err) {
+                callback(err, null, null, null);
+            } else if (response.error) {
+                callback(response.error, null, null, null);
+            } else if (response.result) {
+                callback(null, response.result.data, response.result.width, response.result.height);
+            } else {
+                callback('Illegal State - Empty response', null, null, null);
+            }
+        });
+    } catch (e) {
+        self.emit('error', e);
+        callback(e, null, null, null);
+    }
+};
+
 
 // main export function
 exports.createClient = function (options) {
