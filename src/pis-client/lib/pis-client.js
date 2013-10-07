@@ -81,11 +81,6 @@ Client.prototype.ping = function (callback) {
 };
 
 /**
- * resize function, to resize
- * @param callback in format function(err, result), result is an integer
- */
-
-/**
  * resize function, to resize the input image
  * @param imageData input image binary buffer
  * @param width requested width

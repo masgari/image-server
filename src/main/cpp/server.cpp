@@ -38,8 +38,8 @@ main(int argc, char *argv[]) {
         po::options_description desc("Image Processing Server options");
         desc.add_options()
                 ("help", "produce this help message")
-                ("port", po::value<int>(&port)->default_value(3800), "listen port number")
-                ("thread", po::value<int>(&threads)->default_value(4), "number of threads")
+                ("port", po::value<int>(&port)->default_value(port), "listen port number (default 3800)")
+                ("thread", po::value<int>(&threads)->default_value(threads), "number of threads (default 4)")
                 ;
 
         po::variables_map vm;
