@@ -25,7 +25,7 @@ module.exports = {
         should.exist(this.client.connect);
 
         this.client.connect(function (err) {
-            test.equals(err, null, 'No error should be thrown.' + err);
+            throw err;
         });
         callback();
     },
