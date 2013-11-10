@@ -2,15 +2,20 @@
 * Main service thrift definition file.
 */
 
+struct TDimension {
+    1: required i16 width;
+    2: required i16 height;
+}
+
 struct TImage {
     1: required list<byte> data;
-    2: optional i16 width;
-    3: optional i16 height;
+    2: optional TDimension dimension;
 }
 
 struct TImageResponse {
     1: optional TImage result;
-    2: optional string error;
+    2: optional TDimension originalDimension;
+    3: optional string error;
 }
 
 service ImageService {

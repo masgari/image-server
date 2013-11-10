@@ -54,10 +54,11 @@ module.exports = {
     testResize: function(test) {
         should.exist(this.client.resize);
         var buff = new Buffer('abc');
-        this.client.resize(buff, 100, 100, function(err, resizeData, w, h){
+        var tester = test;
+        this.client.resize(buff, 100, 100, function(err, resizedData, dimension, originalDimension){
             should.exist(err);
             console.log('error', err, '\n');
-            test.done();
+            tester.done();
         });
     },
 
@@ -72,19 +73,21 @@ module.exports = {
             } else {
                 tester.ok(data);
                 tester.ok(data.length > 0);
-                pisClient.resize(data, 100, 80, function(err, resizeData, w, h){
+                pisClient.resize(data, 100, 80, function(err, resizeData, dimension, originalDimension){
                     should.not.exist(err);
                     tester.ok(resizeData, 'Resized data should not be null.');
                     tester.ok(resizeData.length > 0, 'Resized data length should not be 0.');
-                    tester.ok(w > 0, 'Resized width should not be 0.');
-                    tester.ok(h > 0, 'Resized height should not be 0.');
+                    tester.ok(dimension, 'Resized dimension should not be null.');
+                    tester.ok(dimension.width > 0, 'Resized dimension.width should not be 0.');
+                    tester.ok(dimension.width > 0, 'Resized dimension.height should not be 0.');
+                    tester.ok(originalDimension, 'Original image dimension should not be null.');
                     tester.done();
                 });
             }
         });
     },
 
-    testCartoonizeImage : function(test) {
+    testCartooniseImage : function(test) {
         var pisClient = this.client;
         var tester = test;
         fs.readFile('girl.jpg', function(fsErr, data){
@@ -94,12 +97,14 @@ module.exports = {
             } else {
                 tester.ok(data);
                 tester.ok(data.length > 0);
-                pisClient.cartoonize(data, 100, 80, function(err, returnData, w, h){
+                pisClient.cartoonize(data, 100, 80, function(err, returnData, dimension, originalDimension){
                     should.not.exist(err);
                     tester.ok(returnData, 'Cartoonized data should not be null.');
                     tester.ok(returnData.length > 0, 'Cartoonized data length should not be 0.');
-                    tester.ok(w > 0, 'Cartoonized width should not be 0.');
-                    tester.ok(h > 0, 'Cartoonized height should not be 0.');
+                    tester.ok(dimension, 'Resized dimension should not be null.');
+                    tester.ok(dimension.width > 0, 'Resized dimension.width should not be 0.');
+                    tester.ok(dimension.width > 0, 'Resized dimension.height should not be 0.');
+                    tester.ok(originalDimension, 'Original image dimension should not be null.');
                     tester.done();
                 });
             }

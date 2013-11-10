@@ -1,0 +1,18 @@
+PIS Client: A nodejs client for ImageService
+============================================================
+PIS (Peach Image Service) client is a simple client for communication with Thrift based server ImageService.
+Operations:
+1. Resize: 
+    Resizes the input image
+2. Cartoonise:
+    Converts input image to cartoonised (edge emphasised) version
+
+
+
+Testing:
+ Simple test code is in "test/test.js".
+ To run the test: cde test; nodeunit test.js
+ 
+
+ 
+

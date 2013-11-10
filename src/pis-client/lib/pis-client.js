@@ -80,6 +80,10 @@ Client.prototype.ping = function (callback) {
     }
 };
 
+function createRequest(imageData, width, height) {
+    var dimension = new ttypes.TDimension({width: width, height: height});
+    return new ttypes.TImage({data: imageData, dimension: dimension});
+}
 /**
  * resize function, to resize the input image
  * @param imageData input image binary buffer
@@ -90,14 +94,14 @@ Client.prototype.ping = function (callback) {
 Client.prototype.resize = function (imageData, width, height, callback) {
     var self = this;
     try {
-        var request = new ttypes.TImage({data: imageData, width: width, height: height});
+        var request = createRequest(imageData, width, height);
         this.thriftClient.resize(request, function (err, response) {
             if (err) {
                 callback(err, null, null, null);
             } else if (response.error) {
                 callback(response.error, null, null, null);
-            } else if (response.result) {
-                callback(null, response.result.data, response.result.width, response.result.height);
+            } else if (response.result && response.result.data) {
+                callback(null, response.result.data, response.result.dimension, response.originalDimension);
             } else {
                 callback('Illegal State - Empty response', null, null, null);
             }
@@ -118,14 +122,14 @@ Client.prototype.resize = function (imageData, width, height, callback) {
 Client.prototype.cartoonize = function (imageData, width, height, callback) {
     var self = this;
     try {
-        var request = new ttypes.TImage({data: imageData, width: width, height: height});
+        var request = createRequest(imageData, width, height);
         this.thriftClient.cartoonize(request, function (err, response) {
             if (err) {
                 callback(err, null, null, null);
             } else if (response.error) {
                 callback(response.error, null, null, null);
             } else if (response.result) {
-                callback(null, response.result.data, response.result.width, response.result.height);
+                callback(null, response.result.data, response.result.dimension, response.originalDimension);
             } else {
                 callback('Illegal State - Empty response', null, null, null);
             }

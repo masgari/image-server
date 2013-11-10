@@ -6,19 +6,81 @@
 var Thrift = require('thrift').Thrift;
 
 var ttypes = module.exports = {};
-TImage = module.exports.TImage = function(args) {
-  this.data = null;
+TDimension = module.exports.TDimension = function(args) {
   this.width = null;
   this.height = null;
   if (args) {
-    if (args.data !== undefined) {
-      this.data = args.data;
-    }
     if (args.width !== undefined) {
       this.width = args.width;
     }
     if (args.height !== undefined) {
       this.height = args.height;
+    }
+  }
+};
+TDimension.prototype = {};
+TDimension.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+      if (ftype == Thrift.Type.I16) {
+        this.width = input.readI16();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 2:
+      if (ftype == Thrift.Type.I16) {
+        this.height = input.readI16();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+TDimension.prototype.write = function(output) {
+  output.writeStructBegin('TDimension');
+  if (this.width !== null && this.width !== undefined) {
+    output.writeFieldBegin('width', Thrift.Type.I16, 1);
+    output.writeI16(this.width);
+    output.writeFieldEnd();
+  }
+  if (this.height !== null && this.height !== undefined) {
+    output.writeFieldBegin('height', Thrift.Type.I16, 2);
+    output.writeI16(this.height);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+TImage = module.exports.TImage = function(args) {
+  this.data = null;
+  this.dimension = null;
+  if (args) {
+    if (args.data !== undefined) {
+      this.data = args.data;
+    }
+    if (args.dimension !== undefined) {
+      this.dimension = args.dimension;
     }
   }
 };
@@ -57,15 +119,9 @@ TImage.prototype.read = function(input) {
       }
       break;
       case 2:
-      if (ftype == Thrift.Type.I16) {
-        this.width = input.readI16();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 3:
-      if (ftype == Thrift.Type.I16) {
-        this.height = input.readI16();
+      if (ftype == Thrift.Type.STRUCT) {
+        this.dimension = new ttypes.TDimension();
+        this.dimension.read(input);
       } else {
         input.skip(ftype);
       }
@@ -95,14 +151,9 @@ TImage.prototype.write = function(output) {
     output.writeListEnd();
     output.writeFieldEnd();
   }
-  if (this.width !== null && this.width !== undefined) {
-    output.writeFieldBegin('width', Thrift.Type.I16, 2);
-    output.writeI16(this.width);
-    output.writeFieldEnd();
-  }
-  if (this.height !== null && this.height !== undefined) {
-    output.writeFieldBegin('height', Thrift.Type.I16, 3);
-    output.writeI16(this.height);
+  if (this.dimension !== null && this.dimension !== undefined) {
+    output.writeFieldBegin('dimension', Thrift.Type.STRUCT, 2);
+    this.dimension.write(output);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -112,10 +163,14 @@ TImage.prototype.write = function(output) {
 
 TImageResponse = module.exports.TImageResponse = function(args) {
   this.result = null;
+  this.originalDimension = null;
   this.error = null;
   if (args) {
     if (args.result !== undefined) {
       this.result = args.result;
+    }
+    if (args.originalDimension !== undefined) {
+      this.originalDimension = args.originalDimension;
     }
     if (args.error !== undefined) {
       this.error = args.error;
@@ -145,6 +200,14 @@ TImageResponse.prototype.read = function(input) {
       }
       break;
       case 2:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.originalDimension = new ttypes.TDimension();
+        this.originalDimension.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 3:
       if (ftype == Thrift.Type.STRING) {
         this.error = input.readString();
       } else {
@@ -167,8 +230,13 @@ TImageResponse.prototype.write = function(output) {
     this.result.write(output);
     output.writeFieldEnd();
   }
+  if (this.originalDimension !== null && this.originalDimension !== undefined) {
+    output.writeFieldBegin('originalDimension', Thrift.Type.STRUCT, 2);
+    this.originalDimension.write(output);
+    output.writeFieldEnd();
+  }
   if (this.error !== null && this.error !== undefined) {
-    output.writeFieldBegin('error', Thrift.Type.STRING, 2);
+    output.writeFieldBegin('error', Thrift.Type.STRING, 3);
     output.writeString(this.error);
     output.writeFieldEnd();
   }
