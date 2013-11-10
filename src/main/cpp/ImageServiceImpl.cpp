@@ -37,15 +37,20 @@ int8_t ImageServiceImpl::handlePing() {
 }
 
 void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& request) {
+    if (request.dimension.width < 1 || request.dimension.height < 1)  {
+        _return.__set_error("Invalid resize dimension");
+        return;
+    }
+
     PIX* pix = readPixRequest(_return, request);
     if (pix == NULL) {
         _return.__set_error("Could not create image from data");
         return;
     }
-    cout << "Resizing image\n";
     l_float32 pw = pixGetWidth(pix);
     l_float32 ph = pixGetHeight(pix);
-    l_float32 s = min(request.width / pw, request.height / ph);
+    l_float32 s = min(request.dimension.width / pw, request.dimension.height / ph);
+    //cout << "Resizing image"<<"w:"<<pw<<", h:"<<ph<<", ratio:"<<s<<"\n";
     PIX* scaledPix = pixScale(pix, s, s);
     if (scaledPix != NULL) {
         l_uint8* bytes = NULL;
@@ -53,12 +58,23 @@ void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& reque
 
         if (0 == pixWriteMem(&bytes, &size, scaledPix, pix->informat)) {
             TImage result;
-            result.__set_width(scaledPix->w);
-            result.__set_height(scaledPix->h);
+
+            TDimension resizeDimension;
+            resizeDimension.__set_width(scaledPix->w);
+            resizeDimension.__set_height(scaledPix->h);
+            result.__set_dimension(resizeDimension);
+            //cout<<resizeDimension.width<<", h:"<<resizeDimension.height<<"\n";
+            
             std::vector<int8_t> v(bytes, bytes + size);
             result.__set_data(v);
+
             _return.__set_result(result);
-            cout << "new size:" << size << ", original size:" << request.data.size() << "\n";
+
+            TDimension originalDimension;
+            originalDimension.__set_width(pw);
+            originalDimension.__set_height(ph);
+            _return.__set_originalDimension(originalDimension);            
+            //cout << "new bytes:" << size << ", original bytes:" << request.data.size() << "\n";
         }
         pixDestroy(&scaledPix);
     }
@@ -66,6 +82,10 @@ void ImageServiceImpl::handleResize(TImageResponse& _return, const TImage& reque
 }
 
 void ImageServiceImpl::handleCartoonize(TImageResponse& _return, const TImage& request) {
+    if (request.dimension.width < 1 || request.dimension.height < 1)  {
+        _return.__set_error("Invalid resize dimension");
+        return;
+    }
     PIX* pix = readPixRequest(_return, request);
     if (pix == NULL) {
         _return.__set_error("Could not create image from data");
@@ -76,7 +96,7 @@ void ImageServiceImpl::handleCartoonize(TImageResponse& _return, const TImage& r
 
     l_float32 pw = pixGetWidth(pix);
     l_float32 ph = pixGetHeight(pix);
-    l_float32 s = min(request.width / pw, request.height / ph);
+    l_float32 s = min(request.dimension.width / pw, request.dimension.height / ph);
     PIX* scaled = pixScale(pix, s, s);
     l_int32 informat = pix->informat;
     pixDestroy(&pix);
@@ -142,11 +162,22 @@ void ImageServiceImpl::handleCartoonize(TImageResponse& _return, const TImage& r
         size_t size = 0;
         if (0 == pixWriteMem(&bytes, &size, cartoon, informat)) {
             TImage result;
-            result.__set_width(cartoon->w);
-            result.__set_height(cartoon->h);
+
+            TDimension resizeDimension;
+            resizeDimension.__set_width(cartoon->w);
+            resizeDimension.__set_height(cartoon->h);
+            result.__set_dimension(resizeDimension);
+
             std::vector<int8_t> v(bytes, bytes + size);
             result.__set_data(v);
+
             _return.__set_result(result);
+
+            TDimension originalDimension;
+            originalDimension.__set_width(pw);
+            originalDimension.__set_height(ph);
+            _return.__set_originalDimension(originalDimension);            
+            
             cout << "cartoon size:" << size << ", original size:" << request.data.size() << "\n";
         }
         pixDestroy(&cartoon);
@@ -162,7 +193,7 @@ PIX* readPixRequest(TImageResponse& _return, const TImage& request) {
         _return.__set_error("Invalid data");
         return NULL;
     }
-    cout << "request image w:" << request.width << ", h:" << request.height << "\n";
+    //cout << "request image w:" << request.dimension.width << ", h:" << request.dimension.height << "\n";
     l_uint8* data = (l_uint8*) & request.data[0];
     try {
         return pixReadMem(data, request.data.size());
